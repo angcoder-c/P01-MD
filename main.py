@@ -110,11 +110,18 @@ class Conjunto:
     
     def check_type(self, tipo):
         for elemento in self.elementos:
-            if tipo == 'int' and not isinstance(elemento, int):
-                return False
-            elif tipo == 'str' and not isinstance(elemento, str):
+            try:
+                if tipo == 'int':
+                    int(elemento)
+                elif tipo == 'str':
+                    str(elemento)
+                else:
+                    return False
+            except:
                 return False
         return True
+
+
 
     def conjunto_referencial(self):
         if not self.elementos:
