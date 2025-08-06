@@ -71,7 +71,7 @@ class Conjunto:
         # pares con todos los elementos de ambos conjuntos
         for a in self.elementos:
             for b in otros_elementos:
-                resultado.append((a, b))
+                resultado.append(f'{a}-{b}')
         
         return Conjunto(
             f"{self.id} × {otro_id}", 
