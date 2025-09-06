@@ -3,6 +3,8 @@ PROYECTO 01
 MATEMATICA DISCRETA
 TEORIA DE CONJUNTOS
 06 / 08 / 2025
+SSEGUNDA ENTREGA: 10 / 09 / 2025
+    - Composicion de relaciones
 '''
 
 from __future__ import annotations
@@ -141,6 +143,60 @@ class Conjunto:
 
     def cardinalidad(self):
         return len(self.elementos)
+    
+    def composicion_relaciones(self, otra_relacion: Conjunto):
+        # r es self y s es otra_relacion de tuplas
+        pares_r = []
+        pares_s = []
+            
+        # parsear relaciones a tuplas
+        for elem in self.elementos:
+            if '-' in str(elem):
+                par = str(elem).split('-')
+                if len(par) == 2:
+                    pares_r.append((par[0], par[1]))
+            
+        # procesar la relacion s
+        for elem in otra_relacion.elementos:
+            if '-' in str(elem):
+                par = str(elem).split('-')
+                if len(par) == 2:
+                    pares_s.append((par[0], par[1]))
+            
+        # composicion de la forma (a,b) o (c,d) = (a,d)
+        composicion = []
+        # (a,b) en s
+        for (a, b) in pares_s:
+            # (c,d) en R
+            for (c, d) in pares_r:
+                if b == c:
+                    composicion.append(f"{a}-{d}")
+            
+        return Conjunto(
+            f"({self.id} o {otra_relacion.id})",
+            composicion
+        )
+    
+    def potencia_relacion(self, n: int):
+        # potencia de la forma R^n = R^(n-1) o R
+
+        if n <= 0:
+            raise ValueError("La potencia debe ser positiva")
+        
+        if n == 1:
+            return Conjunto(
+                f"{self.id}^1",
+                list(self.elementos)
+            )
+        
+        # calcular R^n
+        resultado = Conjunto(f"{self.id}_temp", list(self.elementos))
+        
+        for i in range(2, n + 1):
+            resultado = resultado.composicion_relaciones(self)
+            resultado.id = f"{self.id}^{i}"
+        
+        return resultado
 
 
 def main():
@@ -168,12 +224,14 @@ def main():
         (9) Obtener dominio y codominio
         (10) Conjunto referencial
         (11) Cardinalidad
-        (12) Ver conjuntos
+        (12) Composicion de relaciones
+        (13) Potencia de una relacion
+        (14) Ver conjuntos
         (0) Salir
         
         >>>  """)
 
-        if op == '12':
+        if op == '14':
             for items in conjuntos.items():
                 print(f"{items[0]} = {items[1].elementos}  |  U = {items[1].universo}")
 
@@ -228,7 +286,7 @@ def main():
                     resultado = conjuntos[id].complemento()
                     print(resultado)
                 except ValueError as e:
-                    print(f"Error: {e}")
+                    print(f"ERROR: {e}")
             else:
                 print("Conjunto no encontrado.")
 
@@ -273,6 +331,35 @@ def main():
                 print(f"Cardinalidad: {conjuntos[id].cardinalidad()}")
             else:
                 print("Conjunto no encontrado.")
+        
+        if op == '12':
+            a = input("Relacion R: ")
+            b = input("Relacion S: ")
+
+            # si estan en el conjunto
+            if a in conjuntos and b in conjuntos:
+                try:
+                    resultado = conjuntos[a].composicion_relaciones(conjuntos[b])
+                    print(f"Composicion R o S: {resultado}")
+
+                except Exception as e:
+                    print(f"ERROR: {e}")
+            else:
+                print("Relacion no existente")
+        
+        if op == '13':
+            print("Potencia R^n\n==============")
+            id = input("Relacion: ")
+            if id in conjuntos:
+                try:
+                    n = int(input("n: "))
+                    resultado = conjuntos[id].potencia_relacion(n)
+                    print(f"R^{n}: {resultado}")
+
+                except Exception as e:
+                    print(f"ERROR: {e}")
+            else:
+                print("Relacion no existente.")
 
         if op == '0':
             print("Bye")
