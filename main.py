@@ -130,7 +130,7 @@ class Conjunto:
             return "Vacio"
         
         if self.check_type('int'):
-            return 'Números Reales: R'
+            return 'Números Enteros: ℤ'
         elif self.check_type('str'):
             return "Alfabeto"
         elif len(self.elementos) == 0:
@@ -197,7 +197,65 @@ class Conjunto:
             resultado.id = f"{self.id}^{i}"
         
         return resultado
+    def es_reflexiva(self, conjunto_base: Conjunto = None):
+        """Verifica si la relación es reflexiva"""
+        if not conjunto_base:
+            # Si no se proporciona conjunto base, usar el dominio
+            dominio = self.obtener_dominio()
+        else:
+            dominio = conjunto_base.elementos
+        
+        for elemento in dominio:
+            par_reflexivo = f"{elemento}-{elemento}"
+            if par_reflexivo not in self.elementos:
+                return False
+        return True
 
+    def es_simetrica(self):
+        """Verifica si la relación es simétrica"""
+        for elemento in self.elementos:
+            if '-' in str(elemento):
+                a, b = str(elemento).split('-')
+                par_simetrico = f"{b}-{a}"
+                if par_simetrico not in self.elementos:
+                    return False
+        return True
+
+    def es_transitiva(self):
+        """Verifica si la relación es transitiva"""
+        pares = []
+        for elem in self.elementos:
+            if '-' in str(elem):
+                par = str(elem).split('-')
+                if len(par) == 2:
+                    pares.append((par[0], par[1]))
+        
+        for (a, b) in pares:
+            for (c, d) in pares:
+                if b == c:  # Si (a,b) y (b,d) existen
+                    if (a, d) not in pares:  # Entonces (a,d) debe existir
+                        return False
+        return True
+
+    def es_antisimetrica(self):
+        """Verifica si la relación es antisimétrica"""
+        pares = []
+        for elem in self.elementos:
+            if '-' in str(elem):
+                par = str(elem).split('-')
+                if len(par) == 2:
+                    pares.append((par[0], par[1]))
+        
+        for (a, b) in pares:
+            if a != b and (b, a) in pares:
+                return False
+        return True
+
+    def es_relacion_equivalencia(self, conjunto_base: Conjunto = None):
+        """Verifica si es relación de equivalencia"""
+        return (self.es_reflexiva(conjunto_base) and 
+                self.es_simetrica() and 
+                self.es_transitiva())
 
 def main():
     conjuntos = {}
@@ -227,13 +285,11 @@ def main():
         (12) Composicion de relaciones
         (13) Potencia de una relacion
         (14) Ver conjuntos
+        (15) Propiedades de una relacion
         (0) Salir
         
         >>>  """)
 
-        if op == '14':
-            for items in conjuntos.items():
-                print(f"{items[0]} = {items[1].elementos}  |  U = {items[1].universo}")
 
         if op == '1':
             id = input("Nombre: ")
@@ -360,7 +416,28 @@ def main():
                     print(f"ERROR: {e}")
             else:
                 print("Relacion no existente.")
-
+        if op == '14':
+            for items in conjuntos.items():
+                print(f"{items[0]} = {items[1].elementos}  |  U = {items[1].universo}")
+                
+        if op == '15':  # Analizar propiedades de relación
+            id = input("Relación a analizar: ")
+            if id in conjuntos:
+                relacion = conjuntos[id]
+                
+                # Preguntar por conjunto base para reflexividad
+                base_id = input("Conjunto base para reflexividad (opcional): ")
+                conjunto_base = conjuntos[base_id] if base_id in conjuntos else None
+                
+                print(f"\nPropiedades de {id}:")
+                print(f"Reflexiva: {relacion.es_reflexiva(conjunto_base)}")
+                print(f"Simétrica: {relacion.es_simetrica()}")
+                print(f"Transitiva: {relacion.es_transitiva()}")
+                print(f"Antisimétrica: {relacion.es_antisimetrica()}")
+                if conjunto_base:
+                    print(f"Relación de equivalencia: {relacion.es_relacion_equivalencia(conjunto_base)}")
+            else:
+                print("Relación no encontrada.")
         if op == '0':
             print("Bye")
 
