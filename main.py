@@ -3,23 +3,25 @@ PROYECTO 01
 MATEMATICA DISCRETA
 TEORIA DE CONJUNTOS
 06 / 08 / 2025
-SSEGUNDA ENTREGA: 10 / 09 / 2025
+SEGUNDA ENTREGA: 10 / 09 / 2025
     - Composicion de relaciones
 '''
 
 from __future__ import annotations
 
 class Conjunto:
-    def __init__(self, id: str, elementos: list, universo: list = None):
+    universo_global = set()
+
+    def __init__(self, id: str, elementos: list):
         self.id = id
         self.elementos = set(elementos)
-        if universo:
-            self.universo = set(universo)
-        else:
-            self.universo = set()
+
+        Conjunto.universo_global.update(self.elementos)
 
     def add_element(self, element):
         self.elementos.add(element)
+        Conjunto.universo_global.add(element)
+
     
     def remove_element(self, element):
         self.elementos.discard(element)
@@ -32,16 +34,14 @@ class Conjunto:
         resultado = self.elementos.union(otro_conjunto.elementos)
         return Conjunto(
             f"{self.id} ∪ {otro_conjunto.id}", 
-            list(resultado), 
-            list(self.universo)
+            list(resultado)
         )
     
     def interseccion_con(self, otro_conjunto: Conjunto):
         resultado = self.elementos.intersection(otro_conjunto.elementos)
         return Conjunto(
             f"{self.id} ∩ {otro_conjunto.id}", 
-            list(resultado), 
-            list(self.universo)
+            list(resultado)
         )
     
     def diferencia_con(self, otro_conjunto: Conjunto):
@@ -49,20 +49,13 @@ class Conjunto:
 
         return Conjunto(
             f"{self.id} \\ {otro_conjunto.id}", 
-            list(resultado), 
-            list(self.universo)
+            list(resultado)
         )
     
     def complemento(self):
-        if not self.universo:
-            raise ValueError("No se ha establecido un conjunto universo.")
         # diferencia con el conjunto universo
-        resultado = self.universo.difference(self.elementos)
-        return Conjunto(
-            f"{self.id}'", 
-            list(resultado), 
-            list(self.universo)
-        )
+        resultado = Conjunto.universo_global.difference(self.elementos)
+        return Conjunto(f"{self.id}'", list(resultado))
     
     def producto_cartesiano(self, otro_conjunto: Conjunto):
         otros_elementos = otro_conjunto.elementos
@@ -256,6 +249,10 @@ class Conjunto:
         return (self.es_reflexiva(conjunto_base) and 
                 self.es_simetrica() and 
                 self.es_transitiva())
+    
+def mostrar_universo():
+    elementos = sorted(Conjunto.universo_global)
+    return "{" + ", ".join(str(e) for e in elementos) + "}"
 
 def main():
     conjuntos = {}
@@ -286,6 +283,7 @@ def main():
         (13) Potencia de una relacion
         (14) Ver conjuntos
         (15) Propiedades de una relacion
+        (16) Mostrar Conjunto Universo 
         (0) Salir
         
         >>>  """)
@@ -294,9 +292,7 @@ def main():
         if op == '1':
             id = input("Nombre: ")
             elementos = input("Elementos: ").split(',')
-            universo = input("Universo (opcional): ").split(',')
-            universo = universo if universo != [''] else None
-            conjuntos[id] = Conjunto(id, elementos, universo)
+            conjuntos[id] = Conjunto(id, elementos)  
             print(f"Conjunto {id} definido correctamente.")
 
         if op == '2':
@@ -418,7 +414,8 @@ def main():
                 print("Relacion no existente.")
         if op == '14':
             for items in conjuntos.items():
-                print(f"{items[0]} = {items[1].elementos}  |  U = {items[1].universo}")
+                print(f"{items[0]} = {items[1].elementos}  | U = ", end='')
+                mostrar_universo()
                 
         if op == '15':  # Analizar propiedades de relación
             id = input("Relación a analizar: ")
@@ -438,6 +435,10 @@ def main():
                     print(f"Relación de equivalencia: {relacion.es_relacion_equivalencia(conjunto_base)}")
             else:
                 print("Relación no encontrada.")
+
+        if op == '16':
+            print("U = " + mostrar_universo())
+
         if op == '0':
             print("Bye")
 
