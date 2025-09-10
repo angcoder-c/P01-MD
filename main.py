@@ -24,7 +24,7 @@ def main():
         ======================
         Nota: 
             elementos separados por comas (1,2,3)
-            conjuntos por pares separados por guiones (1-2, 3-4, 5-6)
+            conjuntos por pares por comas entre parentesis ((1,2),(3,4),(5,6))
         ++++++++++++++++++++++
         ======================
         (1) Definir conjunto
